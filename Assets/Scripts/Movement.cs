@@ -7,11 +7,13 @@ public class Movement : MonoBehaviour {
     static Vector3 LeftDelta;
     static Vector3 DownDelta;
     static Vector3 RightDelta;
-    public float TurnDelta = 0.3f;
-    public float MovementDelta = 0.3f;
+    public float TurnDelta = 2.5f;
+    public float MovementDelta = 0.1f;
     static float Delta = 0.3f;
     public float Step = 1.0f;
-    public float StepDelta = 0.001f;
+    public float StepDelta = 0.08f;
+
+    public GameObject Avatar;
 
     static Movement()
     {
@@ -60,8 +62,10 @@ public class Movement : MonoBehaviour {
 
         Movement.Delta = MovementDelta;
         SetDeltas(gameObject);
-
-        if (step)
+        
+        Animation a = Avatar.GetComponent<Animation>();
+        if (Avatar.activeInHierarchy
+            && step)
         {
             Step -= StepDelta;
             if(Step < 0
@@ -69,10 +73,28 @@ public class Movement : MonoBehaviour {
             {
                 StepDelta *= -1;
             }
+            if (a != null
+                && (a.IsPlaying("dizzy_idle")
+                || !a.isPlaying))
+            {
+                a.Stop();
+                a.Play("walking_inPlace");
+            }
+        }
+        else if (step)
+        {
+            Step = 1.0f;
         }
         else
         {
             Step = 0.5f;
+            if (a != null
+                && (a.IsPlaying("walking_inPlace")
+                || !a.isPlaying))
+            {
+                a.Stop();
+                a.Play("dizzy_idle");
+            }
         }
 	}
 }
